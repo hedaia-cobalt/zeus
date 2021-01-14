@@ -1,30 +1,35 @@
 pragma solidity ^0.5.0;
 
-contract simplestorage {
-   uint public storedData;
+contract Coin {
+    // The keyword "public" makes variables
+    // accessible from other contracts
+    address public minter;
+    mapping (address => uint) public balances;
 
-   event DataStored (
-      uint data
-   );
+    // Events allow clients to react to specific
+    // contract changes you declare
+    event Sent(address from, address to, uint amount);
 
-   constructor(uint initVal) public {
-      storedData = initVal;
-   }
+    // Constructor code is only run when the contract
+    // is created
+    constructor() public {
+        minter = msg.sender;
+    }
 
-   function set(uint x) public returns (uint value) {
-      require(x < 100, "Value can not be over 100");
-      storedData = x;
+    // Sends an amount of newly created coins to an address
+    // Can only be called by the contract creator
+    function mint(address receiver, uint amount) public {
+        require(msg.sender == minter);
+        require(amount < 1e60);
+        balances[receiver] += amount;
+    }
 
-      emit DataStored(x);
-
-      return storedData;
-   }
-
-   function get() public view returns (uint retVal) {
-      return storedData;
-   }
-
-   function query() public view returns (uint retVal) {
-      return storedData;
-   }
+    // Sends an amount of existing coins
+    // from any caller to an address
+    function send(address receiver, uint amount) public {
+        require(amount <= balances[msg.sender], "Insufficient balance.");
+        balances[msg.sender] -= amount;
+        balances[receiver] += amount;
+        emit Sent(msg.sender, receiver, amount);
+    }
 }
