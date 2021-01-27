@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-contract Coin {
+contract Zeus-Digital {
     // The keyword "public" makes variables
     // accessible from other contracts
     address public minter;
